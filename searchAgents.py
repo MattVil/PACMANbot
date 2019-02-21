@@ -355,7 +355,7 @@ class CornersProblem(search.SearchProblem):
         return len(actions)
 
 
-def getClosestCorner(currentPosition, corners):
+def getClosestGoal(currentPosition, corners):
     # TODO: add doc
     minDistance = 999999999999
     closestCorner = None
@@ -389,7 +389,7 @@ def cornersHeuristic(state, problem):
     currentPosition = state[0]
 
     while(len(remainingCorners)>0):
-        targetCorner, distance = getClosestCorner(currentPosition, remainingCorners)
+        targetCorner, distance = getClosestGoal(currentPosition, remainingCorners)
         totalDistance += distance
         currentPosition = targetCorner
         remainingCorners = tuple(x for x in remainingCorners if x!=targetCorner)
@@ -488,7 +488,17 @@ def foodHeuristic(state, problem):
     """
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
-    return 0
+
+    totalDistance = 0
+    currentPosition = position
+    remainingGoals = foodGrid.asList()
+    while(len(remainingGoals)>0):
+        target, distance = getClosestGoal(currentPosition, remainingGoals)
+        totalDistance += distance
+        currentPosition = target
+        remainingGoals = tuple(x for x in remainingGoals if x!=target)
+
+    return totalDistance
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
