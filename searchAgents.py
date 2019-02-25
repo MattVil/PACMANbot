@@ -361,7 +361,7 @@ def getClosestGoal(currentPosition, corners):
     closestCorner = None
     for corner in corners:
         distance = util.manhattanDistance(currentPosition, corner)
-        if(distance < minDistance):
+        if(distance <= minDistance):
             closestCorner = corner
             minDistance = distance
     return closestCorner, minDistance
@@ -489,16 +489,35 @@ def foodHeuristic(state, problem):
     position, foodGrid = state
     "*** YOUR CODE HERE ***"
 
-    totalDistance = 0
-    currentPosition = position
-    remainingGoals = foodGrid.asList()
-    while(len(remainingGoals)>0):
-        target, distance = getClosestGoal(currentPosition, remainingGoals)
-        totalDistance += distance
-        currentPosition = target
-        remainingGoals = tuple(x for x in remainingGoals if x!=target)
+    # totalDistance = 0
+    # currentPosition = position
+    # remainingGoals = foodGrid.asList()
+    # directClosest, directDistance = getClosestGoal(currentPosition, remainingGoals)
+    # while(len(remainingGoals)>0):
+    #     target, distance = getClosestGoal(currentPosition, remainingGoals)
+    #     totalDistance += distance
+    #     currentPosition = target
+    #     remainingGoals = tuple(x for x in remainingGoals if x!=target)
+    #
+    # try:
+    #     avg = totalDistance/len(foodGrid.asList())
+    # except:
+    #     avg = 0
+    #
+    # return avg    #expanded nodes: 14049
 
-    return totalDistance
+    # return len(foodGrid.asList())      #expanded nodes: 12517
+
+    # distanceList = [0]
+    # for foodDot in foodGrid.asList():
+    #   distanceList.append(util.manhattanDistance(position, foodDot))
+    # return max(distanceList)        #expanded nodes: 9551 but fast
+
+    distanceList = [0]
+    for foodDot in foodGrid.asList():
+      distanceList.append(mazeDistance(position, foodDot, problem.startingGameState))
+    return max(distanceList)        #expanded nodes: 4137 but expensive
+
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
@@ -529,7 +548,7 @@ class ClosestDotSearchAgent(SearchAgent):
         problem = AnyFoodSearchProblem(gameState)
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        return search.astar(problem)
 
 class AnyFoodSearchProblem(PositionSearchProblem):
     """
@@ -565,7 +584,12 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         x,y = state
 
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        remainingGoals = self.food.asList()
+        target, distance = getClosestGoal(state, remainingGoals)
+        if(target == state):
+            return True
+        else:
+            return False
 
 def mazeDistance(point1, point2, gameState):
     """
