@@ -356,7 +356,10 @@ class CornersProblem(search.SearchProblem):
 
 
 def getClosestGoal(currentPosition, corners):
-    # TODO: add doc
+    """
+    Find the nearest corner of the initial position and return it with the
+    distance
+    """
     minDistance = 999999999999
     closestCorner = None
     for corner in corners:
@@ -504,19 +507,19 @@ def foodHeuristic(state, problem):
     # except:
     #     avg = 0
     #
-    # return avg    #expanded nodes: 14049
+    # return avg    #expanded nodes: 14049 in 8.1 seconds
 
-    # return len(foodGrid.asList())      #expanded nodes: 12517
+    # return len(foodGrid.asList())      #expanded nodes: 12517 in 5.5 seconds
 
     # distanceList = [0]
     # for foodDot in foodGrid.asList():
     #   distanceList.append(util.manhattanDistance(position, foodDot))
-    # return max(distanceList)        #expanded nodes: 9551 but fast
+    # return max(distanceList)        #expanded nodes: 9551 in 3.8 seconds
 
     distanceList = [0]
     for foodDot in foodGrid.asList():
       distanceList.append(mazeDistance(position, foodDot, problem.startingGameState))
-    return max(distanceList)        #expanded nodes: 4137 but expensive
+    return max(distanceList)        #expanded nodes: 4137 in 26.2 seconds
 
 
 class ClosestDotSearchAgent(SearchAgent):

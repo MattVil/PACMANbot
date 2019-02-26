@@ -62,7 +62,7 @@ class SearchProblem:
         util.raiseNotDefined()
 
 class State:
-    # TODO: doc
+    """Data structure for State representation in seach algorithm"""
 
     def __init__(self, gameState, previousState, action, cost=0):
         self.state = gameState
@@ -71,7 +71,7 @@ class State:
         self.cost = cost
 
     def getPath(self):
-        # TODO: doc
+        """Return the list of actions that leads to this State"""
         result = list()
         currentState = self
         while(currentState.previous != None):
@@ -108,7 +108,7 @@ def tinyMazeSearch(problem):
     s = Directions.SOUTH
     w = Directions.WEST
     return  [s, s, w, s, w, w, s, w]
-    
+
 
 def depthFirstSearch(problem):
     """
