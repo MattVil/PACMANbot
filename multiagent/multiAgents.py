@@ -241,17 +241,100 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         legal moves.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        bestValue = float("-inf")
+        bestAction = 'Stop'
+        actions = gameState.getLegalActions(0)
+        for action in actions:
+            successor = gameState.generateSuccessor(0, action)
+            value = self.expectimax(successor, 0, 1)
+            if((value == bestValue) and (random.uniform(0, 1) > 0.5)):
+                bestValue = value
+                bestAction = action
+            elif(value > bestValue):
+                bestValue = value
+                bestAction = action
+        return bestAction
+
+    def expectimax(self, gameState, depth, agentIndex):
+        if(agentIndex >= gameState.getNumAgents()):
+            agentIndex = 0
+            depth += 1
+
+        if(depth==self.depth or gameState.isWin() or gameState.isLose()):
+            return self.evaluationFunction(gameState)
+
+        actions = gameState.getLegalActions(agentIndex)
+        if(agentIndex != 0):
+            sumValues = 0
+            for action in actions:
+                successor = gameState.generateSuccessor(agentIndex, action)
+                sumValues += self.expectimax(successor, depth, agentIndex+1)
+            return sumValues/len(actions)
+        else:
+            value = float("-inf")
+            for action in actions:
+                successor = gameState.generateSuccessor(agentIndex, action)
+                value = max(self.expectimax(successor, depth, agentIndex+1), value)
+            return value
+
+
 
 def betterEvaluationFunction(currentGameState):
     """
     Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
     evaluation function (question 5).
 
-    DESCRIPTION: <write something here so we know what you did>
+    DESCRIPTION: eval = currentScore - sum(foodCoef*foodDistance)
+                                     - sum(capsuleCoef*capsuleDistance)
+                                     + sum(ghostCoef*ghostSign*ghostDistance)
+
+                                     Where ghostSign =  1  if normal ghost
+                                           ghostSign = -1  if scared ghost
+
+                 Give different values ​​to the coefficients will leads to
+                 different behavior. The best behavior founded is with :
+                    foodCoef = 0.5
+                    capsuleCoef = 18.15
+                    ghostCoef = 1
+                 The average score is 1279.9
     """
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    foodPos = currentGameState.getFood().asList()
+    foodDist = []
+    ghostStates = currentGameState.getGhostStates()
+    capsules = currentGameState.getCapsules()
+    currentPos = list(currentGameState.getPacmanPosition())
+
+    #1/2/1 - 862.5
+    #0.1/2/1 - 1063.0
+    #0.1/10/1 - 1245.3
+    #0.1/10/0.5 - 1239.8 NEVER BELOW 1000
+    #0.5/15/1 - 1265.7 NEVER BELOW 1100
+    #0.5/18.15/1 - 1279.9 NEVER BELOW 1100
+    foodCoef = 0.5
+    capsuleCoef = 18.15
+    ghostCoef = 1
+
+    score = currentGameState.getScore()
+
+    for food in foodPos:
+        foodDist = manhattanDistance(food, currentPos)
+        score -= foodCoef*foodDist
+
+    for ghost in ghostStates:
+        ghostDist = manhattanDistance(ghost.getPosition(), currentPos)
+        if(ghost.scaredTimer > 0):
+            ghostSign = -1
+        else:
+            ghostSign = 1
+        score += ghostCoef*ghostSign*ghostDist
+
+    for capsule in capsules:
+        capsuleDist = manhattanDistance(capsule, currentPos)
+        score -= capsuleCoef*capsuleDist
+
+    return score
 
 # Abbreviation
 better = betterEvaluationFunction
